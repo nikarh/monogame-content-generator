@@ -1,0 +1,15 @@
+builds:
+  gcflags:
+  - all=-trimpath={{.Env.GOPATH}}
+  goos:
+  - linux
+  - windows
+  goarch:
+  - amd64
+archives:
+  format: gz
+  format_overrides:
+  - goos: windows
+    format: zip
+  files:
+  - none*
