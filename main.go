@@ -68,7 +68,7 @@ func main() {
 				segments[i] = strings.Title(segments[i])
 			}
 			var className = strings.Join(segments, "")
-			var fieldName = strings.Title(badChars.ReplaceAllString(strings.SplitN(filepath.Base(matchedFile), ".", 1)[0], ""))
+			var fieldName = strings.Title(badChars.ReplaceAllString(strings.SplitN(filepath.Base(matchedFile), ".", 2)[0], ""))
 
 			if _, ok := classes[className]; !ok {
 				classes[className] = []ClassField{{
