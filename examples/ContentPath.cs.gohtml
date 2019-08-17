@@ -2,7 +2,6 @@ namespace Game
 {
     class Content
     {
-    {{ . }}
     {{- range $name, $fields := .classes -}}
         public static class {{ $name }} {
         {{- range $field := $fields }}

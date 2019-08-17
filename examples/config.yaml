@@ -1,22 +1,26 @@
-Fonts/*.spritefont:
-  content:
-  - "/importer:FontDescriptionImporter"
-  - "/processor:FontDescriptionProcessor"
-  - "/processorParam:PremultiplyAlpha=True"
-  - "/processorParam:TextureFormat=Compressed"
-Particles/*.pex:
-  content:
-  - "/importer:ParticleDesignerImporter"
-  - "/processor:ParticleDesignerProcessor"
-Sprites/*.png:
-  content:
-  - "/importer:TextureImporter"
-  - "/processor:TextureProcessor"
-  - "/processorParam:ColorKeyColor=255,0,255,255"
-  - "/processorParam:ColorKeyEnabled=True"
-  - "/processorParam:GenerateMipmaps=False"
-  - "/processorParam:PremultiplyAlpha=True"
-  - "/processorParam:ResizeToPowerOfTwo=False"
-  - "/processorParam:MakeSquare=False"
-  - "/processorParam:TextureFormat=Color"
-
+templates:
+- ContentPath.cs.gohtml
+- Content/Content.mgcb.gohtml
+contentPath: Content
+content:
+  Fonts/*.spritefont:
+    content:
+    - "/importer:FontDescriptionImporter"
+    - "/processor:FontDescriptionProcessor"
+    - "/processorParam:PremultiplyAlpha=True"
+    - "/processorParam:TextureFormat=Compressed"
+  Particles/*.pex:
+    content:
+    - "/importer:ParticleDesignerImporter"
+    - "/processor:ParticleDesignerProcessor"
+  Sprites/*.png:
+    content:
+    - "/importer:TextureImporter"
+    - "/processor:TextureProcessor"
+    - "/processorParam:ColorKeyColor=255,0,255,255"
+    - "/processorParam:ColorKeyEnabled=True"
+    - "/processorParam:GenerateMipmaps=False"
+    - "/processorParam:PremultiplyAlpha=True"
+    - "/processorParam:ResizeToPowerOfTwo=False"
+    - "/processorParam:MakeSquare=False"
+    - "/processorParam:TextureFormat=Color"

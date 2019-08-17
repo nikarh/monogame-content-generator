@@ -11,7 +11,11 @@ import (
 	"text/template"
 )
 
-type ConfigFile map[string]map[string]interface{}
+type ConfigFile struct {
+	Templates   []string
+	Content     map[string]map[string]interface{}
+	ContentPath string `yaml:"contentPath"`
+}
 
 type ClassField struct {
 	Name  string
@@ -22,22 +26,11 @@ var badChars, _ = regexp.Compile(`[^\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}\p{Nl}\p{Mn}\p
 
 func main() {
 	configFile := flag.String("config", "", "A path to a yaml config file")
-	dir := flag.String("dir", "", "A directory where to search")
 
 	flag.Parse()
 
-	if dir != nil {
-		_ = os.Chdir(*dir)
-	}
-
 	if configFile == nil || *configFile == "" {
 		println("You must pass -config argument")
-		return
-	}
-
-	templates := flag.Args()
-	if len(templates) == 0 {
-		println("You must pass paths to templates")
 		return
 	}
 
@@ -46,7 +39,7 @@ func main() {
 		panic(err)
 	}
 
-	var config = make(ConfigFile)
+	var config ConfigFile
 	err = yaml.Unmarshal(configBytes, &config)
 	if err != nil {
 		panic(err)
@@ -54,12 +47,16 @@ func main() {
 
 	var classes = make(map[string][]ClassField)
 
-	for pattern, _ := range config {
+	oldWd, _ := os.Getwd()
+	_ = os.Chdir(filepath.Join(filepath.Dir(*configFile), config.ContentPath))
+
+
+	for pattern, _ := range config.Content {
 		matches, err := filepath.Glob(pattern)
 		if err != nil {
 			panic(err)
 		}
-		config[pattern]["files"] = matches
+		config.Content[pattern]["files"] = matches
 
 		for _, matchedFile := range matches {
 			var dir = filepath.Dir(matchedFile)
@@ -84,10 +81,13 @@ func main() {
 	}
 
 	var templateData = make(map[string]interface{})
-	templateData["groups"] = config
+	templateData["groups"] = config.Content
 	templateData["classes"] = classes
 
-	for _, templateFile := range templates {
+	_ = os.Chdir(oldWd)
+	_ = os.Chdir(filepath.Dir(*configFile))
+
+	for _, templateFile := range config.Templates {
 		templateBytes, err := ioutil.ReadFile(templateFile)
 		if err != nil {
 			panic(err)
