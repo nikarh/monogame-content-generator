@@ -70,16 +70,15 @@ func main() {
 			var className = strings.Join(segments, "")
 			var fieldName = strings.Title(badChars.ReplaceAllString(strings.SplitN(filepath.Base(matchedFile), ".", 2)[0], ""))
 
+			field := ClassField{
+				Name:  fieldName,
+				Value: strings.TrimSuffix(matchedFile, filepath.Ext(matchedFile)),
+			}
+
 			if _, ok := classes[className]; !ok {
-				classes[className] = []ClassField{{
-					Name:  fieldName,
-					Value: strings.TrimSuffix(matchedFile, filepath.Ext(matchedFile)),
-				}}
+				classes[className] = []ClassField{field}
 			} else {
-				classes[className] = append(
-					classes[className],
-					ClassField{Name: fieldName, Value: matchedFile},
-				)
+				classes[className] = append(classes[className], field)
 			}
 		}
 	}
