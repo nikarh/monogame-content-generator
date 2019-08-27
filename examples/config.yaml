@@ -1,26 +1,73 @@
 templates:
-- ContentPath.cs.gohtml
-- Content/Content.mgcb.gohtml
+- path: ContentPath.cs
+  body: |
+    namespace Game
+    {
+        class Content
+        {
+        {{- range $name, $fields := .classes }}
+            public static class {{ $name }} {
+            {{- range $field := $fields }}
+                public const string {{ $field.Name }} = @"{{ $field.Value }}";
+            {{- end }}
+            }
+        {{- end }}
+        }
+    }
+
+- path: Content/Content.mgcb
+  body: |
+    #----------------------------- Global Properties ----------------------------#
+
+    /outputDir:../bin/$(Platform)
+    /intermediateDir:../obj/$(Platform)
+    /platform:DesktopGL
+    /config:
+    /profile:Reach
+    /compress:False
+
+    #-------------------------------- References --------------------------------#
+
+    /reference:../../dlls/Nez.dll
+    /reference:../../dlls/Nez.PipelineImporter.dll
+    /reference:../../dlls/Newtonsoft.Json.dll
+    /reference:../../dlls/Ionic.ZLib.dll
+
+    #---------------------------------- Content ---------------------------------#
+
+    {{- range $config := .groups -}}
+        {{- range $file := $config.FileNames }}
+
+    #begin {{ $file }}
+            {{- range $line := $config.Content }}
+    {{ $line }}
+            {{- end }}
+    /build:{{ $file }}
+        {{- end }}
+    {{- end }}
 contentPath: Content
 content:
-  Fonts/*.spritefont:
-    content:
-    - "/importer:FontDescriptionImporter"
-    - "/processor:FontDescriptionProcessor"
-    - "/processorParam:PremultiplyAlpha=True"
-    - "/processorParam:TextureFormat=Compressed"
-  Particles/*.pex:
-    content:
-    - "/importer:ParticleDesignerImporter"
-    - "/processor:ParticleDesignerProcessor"
-  Sprites/*.png:
-    content:
-    - "/importer:TextureImporter"
-    - "/processor:TextureProcessor"
-    - "/processorParam:ColorKeyColor=255,0,255,255"
-    - "/processorParam:ColorKeyEnabled=True"
-    - "/processorParam:GenerateMipmaps=False"
-    - "/processorParam:PremultiplyAlpha=True"
-    - "/processorParam:ResizeToPowerOfTwo=False"
-    - "/processorParam:MakeSquare=False"
-    - "/processorParam:TextureFormat=Color"
+- paths:
+  - Fonts/*.spritefont
+  content:
+  - "/importer:FontDescriptionImporter"
+  - "/processor:FontDescriptionProcessor"
+  - "/processorParam:PremultiplyAlpha=True"
+  - "/processorParam:TextureFormat=Compressed"
+- paths:
+  - Particles/*.pex
+  content:
+  - "/importer:ParticleDesignerImporter"
+  - "/processor:ParticleDesignerProcessor"
+- paths:
+  - Sprites/*.png
+  content:
+  - "/importer:TextureImporter"
+  - "/processor:TextureProcessor"
+  - "/processorParam:ColorKeyColor=255,0,255,255"
+  - "/processorParam:ColorKeyEnabled=True"
+  - "/processorParam:GenerateMipmaps=False"
+  - "/processorParam:PremultiplyAlpha=True"
+  - "/processorParam:ResizeToPowerOfTwo=False"
+  - "/processorParam:MakeSquare=False"
+  - "/processorParam:TextureFormat=Color"

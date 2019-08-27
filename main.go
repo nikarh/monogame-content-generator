@@ -11,9 +11,20 @@ import (
 	"text/template"
 )
 
+type Template struct {
+	Path string
+	Body string
+}
+
+type ContentEntry struct {
+	Paths     []string
+	Content   []string
+	FileNames []string
+}
+
 type ConfigFile struct {
-	Templates   []string
-	Content     map[string]map[string]interface{}
+	Templates   []Template
+	Content     []ContentEntry
 	ContentPath string `yaml:"contentPath"`
 }
 
@@ -50,15 +61,21 @@ func main() {
 	oldWd, _ := os.Getwd()
 	_ = os.Chdir(filepath.Join(filepath.Dir(*configFile), config.ContentPath))
 
-
-	for pattern, _ := range config.Content {
-		matches, err := filepath.Glob(pattern)
-		if err != nil {
-			panic(err)
+	for i, contentEntry := range config.Content {
+		var fileNames = make([]string, 0, 0)
+		for _, filePattern := range contentEntry.Paths {
+			matches, err := filepath.Glob(filePattern)
+			if err != nil {
+				panic(err)
+			}
+			for _, foundFile := range matches {
+				fileNames = append(fileNames, foundFile)
+			}
 		}
-		config.Content[pattern]["files"] = matches
 
-		for _, matchedFile := range matches {
+		config.Content[i].FileNames = fileNames
+
+		for _, matchedFile := range fileNames {
 			var dir = filepath.Dir(matchedFile)
 			var segments = strings.Split(dir, string(os.PathSeparator))
 			for i := range segments {
@@ -87,18 +104,13 @@ func main() {
 	_ = os.Chdir(oldWd)
 	_ = os.Chdir(filepath.Dir(*configFile))
 
-	for _, templateFile := range config.Templates {
-		templateBytes, err := ioutil.ReadFile(templateFile)
-		if err != nil {
-			panic(err)
-		}
-		parsedTemplate, err := template.New(templateFile).Parse(string(templateBytes))
+	for _, tpl := range config.Templates {
+		parsedTemplate, err := template.New(tpl.Path).Parse(tpl.Body)
 		if err != nil {
 			panic(err)
 		}
 
-		newFileName := strings.TrimSuffix(templateFile, filepath.Ext(templateFile))
-		interpolated, err := os.OpenFile(newFileName, os.O_WRONLY|os.O_CREATE, os.ModePerm)
+		interpolated, err := os.OpenFile(tpl.Path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.ModePerm)
 		if err != nil {
 			panic(err)
 		}
